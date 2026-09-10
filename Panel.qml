@@ -183,6 +183,9 @@ Panel {
   function openUrl(url) {
     var value = String(url || "")
     if (value === "") return
+    // Every link here comes from GitHub data, but only https should ever reach
+    // the URL handler: no file:, javascript:, or custom xdg handler.
+    if (value.indexOf("https://") !== 0) return
     // Let the default URL handler route browser tabs to the intended workspace.
     if (github.linkBehavior === "Browser tab") Util.execArgv(["xdg-open", value])
     else Quickshell.execDetached(["omarchy-launch-webapp", value])
