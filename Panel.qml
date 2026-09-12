@@ -125,8 +125,7 @@ Panel {
   function openRow(kind, id, url) {
     var target = String(url || "")
     var notificationId = String(id || "")
-    openUrl(target)
-    if (kind === "notification") github.markNotificationRead(notificationId)
+    if (openUrl(target) && kind === "notification") github.markNotificationRead(notificationId)
   }
   function markSelectedRead() {
     if (selectedTarget && selectedTarget.kind === "notification") github.markNotificationRead(String(selectedTarget.row.id || ""))
@@ -181,7 +180,9 @@ Panel {
   }
 
   function openUrl(url) {
-    if (urlLauncher.openUrl(url)) close()
+    var accepted = urlLauncher.openUrl(url)
+    if (accepted) close()
+    return accepted
   }
 
   // Settings live on this widget's entry in shell.json; the shell hot-reloads
