@@ -181,15 +181,7 @@ Panel {
   }
 
   function openUrl(url) {
-    var value = String(url || "")
-    if (value === "") return
-    // Every link here comes from GitHub data, but only https should ever reach
-    // the URL handler: no file:, javascript:, or custom xdg handler.
-    if (value.indexOf("https://") !== 0) return
-    // Let the default URL handler route browser tabs to the intended workspace.
-    if (github.linkBehavior === "Browser tab") Util.execArgv(["xdg-open", value])
-    else Quickshell.execDetached(["omarchy-launch-webapp", value])
-    close()
+    if (urlLauncher.openUrl(url)) close()
   }
 
   // Settings live on this widget's entry in shell.json; the shell hot-reloads
@@ -280,6 +272,14 @@ Panel {
   onCursorTargetsChanged: ensureCursor()
 
   Service { id: github; settings: root.settings }
+
+  UrlLauncher {
+    id: urlLauncher
+    linkBehavior: github.linkBehavior
+    // Both launchers receive an argv array; no URL is interpreted by a shell.
+    onBrowserLaunchRequested: function(argv) { Util.execArgv(argv) }
+    onWebAppLaunchRequested: function(argv) { Quickshell.execDetached(argv) }
+  }
 
   IpcHandler {
     target: root.ipcTarget
